@@ -167,6 +167,18 @@ The core function of this app is to run 5 analytical queries that highlight barr
 3.  **Top 10 Eviction Leaders:**
     * **Description:** "List the top 10 counties with the highest number of `evict_filings`."
     * **Barrier:** This identifies the epicenters of the eviction crisis.
+    * **Implementation Status:**  
+This query is now **fully implemented** in the app (Week 3).  
+- The SQL logic lives in `database.py` → function: `get_top10_eviction_leaders()`.  
+- The Streamlit UI (in `app.py`) includes a button labeled **"Show Top 10 Counties by Eviction Filings"**.  
+- When clicked, it displays the results in a clean, interactive table showing **County**, **State**, and **Eviction Filings**.  
+
+**Example Output:**
+| County | State | Eviction Filings |
+|---------|--------|-----------------|
+| Harris | TX | 1200 |
+| Dallas | TX | 950 |
+| ... | ... | ... |
 
 4.  **Affordability vs. Filings Correlation:**
     * **Description:** "Show counties where `rent_median_gross` is in the top 25% but `income_median_household` is in the bottom 25%."
@@ -181,7 +193,7 @@ The core function of this app is to run 5 analytical queries that highlight barr
 ## 👥 Team Members
 
 Emilio Villar
-
+Alejandra Flores
 
 ## 9. 📅 Weekly Goals & Timeline
 
@@ -216,7 +228,12 @@ This plan outlines our team's goals for each week, aligned with the project's of
     * Query 3: Demographic Disparity Query.
 * [**To-Do**] **Front-End for Queries:** Build the UI components (e.g., sliders, text inputs, buttons) in `app.py` to run these three queries and display their results in a table.
 * **Deliverable:** **Week 3 check-in.** (Three queries functional through UI).
-
+## 🧠 Week 3 Update (Nov 11, 2025)
+- Implemented **Top 10 Eviction Leaders Analytical Query**
+- Added corresponding **Streamlit front-end button** in `app.py`
+- Updated `database.py` with SQL query function
+- Verified data displays correctly with test records
+- Updated README.md with new query description
 ---
 
 ### **Week 4: Integration & Full CRUD (Nov 10-16)**
