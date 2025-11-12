@@ -98,4 +98,59 @@ with col2:
 
 # --- WEEK 3: Analytical Queries (Stubbed out) ---
 st.header("Analytical Queries (Week 3)")
+
 st.write("This is where your 5 analytical queries will go.")
+# --- WEEK 3: Analytical Queries ---
+st.header("Analytical Queries (Week 3)")
+st.markdown("These queries highlight barriers related to housing and eviction data.")
+
+# === Query 1: Barrier Hotspot ===
+st.subheader("Query 1: Barrier Hotspot (Low Income & High Rent Burden)")
+st.write("Find counties where median income is below a threshold and rent burden percentage is above a threshold.")
+
+income_threshold = st.number_input("Income below ($):", value=50000)
+rent_burden_threshold = st.number_input("Rent burden above (%):", value=35)
+
+if st.button("Run Query 1"):
+    result = db.query_barrier_hotspot(income_threshold, rent_burden_threshold)
+    if len(result) > 0:
+        st.dataframe(result)
+    else:
+        st.info("No results found for the selected thresholds.")
+
+# === Query 2: Top 10 Eviction Leaders ===
+st.subheader("Query 2: Top 10 Eviction Leaders")
+if st.button("Run Query 2"):
+    result = db.get_top10_eviction_leaders()
+    if len(result) > 0:
+        st.dataframe(result)
+    else:
+        st.info("No eviction data found.")
+
+# === Query 3: Demographic Disparity ===
+st.subheader("Query 3: Demographic Disparity (Race & Evictions)")
+if st.button("Run Query 3"):
+    result = db.query_demographic_disparity()
+    if len(result) > 0:
+        st.dataframe(result)
+    else:
+        st.info("No data found for demographic disparity query.")
+
+# === Query 4: Affordability vs. Filings ===
+st.subheader("Query 4: Affordability vs. Filings Correlation")
+if st.button("Run Query 4"):
+    result = db.query_affordability_vs_filings()
+    if len(result) > 0:
+        st.dataframe(result)
+    else:
+        st.info("No results found for affordability vs. filings.")
+
+# === Query 5: State-Level Summary ===
+st.subheader("Query 5: State-Level Summary (By State)")
+state_input = st.text_input("Enter State Abbreviation (e.g., TX, CA, FL):").upper()
+if st.button("Run Query 5"):
+    result = db.query_state_summary(state_input)
+    if len(result) > 0:
+        st.dataframe(result)
+    else:
+        st.info("No results found for that state.")
