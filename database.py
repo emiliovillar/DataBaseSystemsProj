@@ -110,4 +110,105 @@ def get_county_list():
     conn = get_db()
     counties = conn.execute("SELECT fips, county_name FROM Counties ORDER BY county_name").fetchall()
     conn.close()
+
     return counties
+    
+    # --- WEEK 3: Analytical Queries ---
+
+import pandas as pd
+
+def get_top10_eviction_leaders():
+    """Returns the top 10 counties with the highest eviction filings."""
+    conn = get_db()
+    query = """
+        SELECT c.county_name, c.state_abbr, e.evict_filings
+        FROM Evictions e
+        JOIN Counties c ON e.fips = c.fips
+        ORDER BY e.evict_filings DESC
+        LIMIT 10;
+    """
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
+
+
+def query_barrier_hotspot(income_threshold, rent_burden_threshold):
+    """Counties where income < threshold AND rent burden > threshold."""
+    conn = get_db()
+    query = """
+        SELECT c.county_name, c.state_abbr,
+               d.income_median_household,
+               h.rent_burdened_pct
+        FROM Counties c
+        JOIN Demographics d ON c.fips = d.fips
+        JOIN Housing h ON c.fips = h.fips
+        WHERE d.income_median_household < ?
+          AND h.rent_burdened_pct > ?
+        ORDER BY h.rent_burdened_pct DESC;
+    """
+    df = pd.read_sql_query(query, conn, params=(income_threshold, rent_burden_threshold))
+    conn.close()
+    return df
+
+
+def query_demographic_disparity():
+    """Compare eviction rates between high-Black-pop counties and low-Black-pop counties."""
+    conn = get_db()
+    query = """
+        SELECT 
+            CASE 
+                WHEN d.pop_black * 1.0 / d.pop_total > 0.3 THEN 'Over 30% Black'
+                WHEN d.pop_black * 1.0 / d.pop_total < 0.1 THEN 'Under 10% Black'
+            END AS group_label,
+            AVG(e.evict_filings) AS avg_evictions
+        FROM Demographics d
+        JOIN Evictions e ON d.fips = e.fips
+        WHERE group_label IS NOT NULL
+        GROUP BY group_label;
+    """
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
+
+
+def query_affordability_vs_filings():
+    """Show counties where rent is high and income is low."""
+    conn = get_db()
+    query = """
+        SELECT c.county_name, c.state_abbr,
+               h.rent_median_gross,
+               d.income_median_household,
+               e.evict_filings
+        FROM Counties c
+        JOIN Housing h ON c.fips = h.fips
+        JOIN Demographics d ON c.fips = d.fips
+        JOIN Evictions e ON c.fips = e.fips
+        WHERE h.rent_median_gross > (
+            SELECT PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY rent_median_gross) FROM Housing
+        )
+        AND d.income_median_household < (
+            SELECT PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY income_median_household) FROM Demographics
+        )
+        ORDER BY e.evict_filings DESC;
+    """
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
+
+
+def query_state_summary(state_abbr):
+    """Summarize average rent burden and total evictions by state."""
+    conn = get_db()
+    query = """
+        SELECT c.state_abbr,
+               AVG(h.rent_burdened_pct) AS avg_rent_burden,
+               SUM(e.evict_filings) AS total_evictions
+        FROM Counties c
+        JOIN Housing h ON c.fips = h.fips
+        JOIN Evictions e ON c.fips = e.fips
+        WHERE c.state_abbr = ?
+        GROUP BY c.state_abbr;
+    """
+    df = pd.read_sql_query(query, conn, params=(state_abbr,))
+    conn.close()
+    return df
