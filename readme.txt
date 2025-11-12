@@ -79,6 +79,7 @@ This project merges data from two primary sources, linked by county `FIPS` code:
 ### 👥 Team Members
 
 * Emilio Villar
-* [Teammate 1 Name]
+* Alejandra Flores
 * [Teammate 2 Name]
+
 * [Teammate 3 Name]
