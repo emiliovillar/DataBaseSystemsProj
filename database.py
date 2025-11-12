@@ -110,4 +110,18 @@ def get_county_list():
     conn = get_db()
     counties = conn.execute("SELECT fips, county_name FROM Counties ORDER BY county_name").fetchall()
     conn.close()
+
     return counties
+    
+def get_top10_eviction_leaders():
+    conn = get_db()
+    result = conn.execute("""
+        SELECT c.county_name, c.state_abbr, e.evict_filings
+        FROM Evictions e
+        JOIN Counties c ON e.fips = c.fips
+        ORDER BY e.evict_filings DESC
+        LIMIT 10;
+    """).fetchall()
+    conn.close()
+    
+    return result
